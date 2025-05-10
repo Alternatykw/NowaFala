@@ -29,7 +29,10 @@ function UserProfile() {
               deaths,
               assists,
               CS,
-              is_win
+              is_win,
+              dmg_dealt,
+              dmg_received,
+              dmg_tower
             )
           `)
           .order('date_played', { ascending: false });
