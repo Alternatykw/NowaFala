@@ -25,6 +25,13 @@ const championNameToApiName = {
   "Lee Sin": "LeeSin",
 };
 
+const getDisplayChampionName = (apiName) => {
+    const entry = Object.entries(championNameToApiName).find(
+      ([display, api]) => api === apiName
+    );
+    return entry ? entry[0] : apiName;
+  };
+
 const getApiChampionName = (displayName) => {
   if (!displayName) return ''; 
   return championNameToApiName[displayName] || displayName.replace(/\s+/g, '').replace(/['.]/g, '');
@@ -86,7 +93,7 @@ function MatchList({ matches }) {
                     {formatMatchTime(match.time)}
                 </Typography>
                 <Typography variant="h6">
-                    {mainPlayer?.champion || 'Unknown Champion'} {mainPlayer?.role ? `(${mainPlayer.role.toUpperCase()})` : ''}
+                    {getDisplayChampionName(mainPlayer?.champion) || 'Unknown Champion'} {mainPlayer?.role ? `(${mainPlayer.role.toUpperCase()})` : ''}
                 </Typography>
                 <Typography fontWeight="bold">
                     {mainPlayer?.is_win === true ? 'WIN' : 'LOSE' || 'Unknown Result'}
