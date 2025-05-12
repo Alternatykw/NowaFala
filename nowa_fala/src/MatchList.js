@@ -232,7 +232,7 @@ function MatchList({ matches }) {
             />
             <Box sx={{ flex: 1 }}>
               <Typography variant="body2" color="white">
-                {champ.displayName}{' '}
+                {getDisplayChampionName(champ.displayName)}{' '}
                 <Typography
                   variant="body2"
                   component="span"
