@@ -111,30 +111,45 @@ function MatchList({ matches }) {
   
       const champ = getApiChampionName(player.champion);
       if (!stats[champ]) {
-        stats[champ] = { name: player.champion, wins: 0, losses: 0 };
+        stats[champ] = {
+          name: player.champion,
+          wins: 0,
+          losses: 0,
+          kills: 0,
+          deaths: 0,
+          assists: 0,
+        };
       }
   
-      if (player.is_win) {
-        stats[champ].wins += 1;
-      } else {
-        stats[champ].losses += 1;
-      }
+      if (player.is_win) stats[champ].wins += 1;
+      else stats[champ].losses += 1;
+  
+      stats[champ].kills += player.kills || 0;
+      stats[champ].deaths += player.deaths || 0;
+      stats[champ].assists += player.assists || 0;
     });
   
     return Object.entries(stats)
-      .sort((a, b) => (b[1].wins + b[1].losses) - (a[1].wins + a[1].losses)) // Most games first
-      .map(([apiName, { name, wins, losses }]) => {
-        const totalGames = wins + losses;
-        const winrate = totalGames > 0 ? ((wins / totalGames) * 100).toFixed(1) : '0.0';
+      .sort((a, b) => (b[1].wins + b[1].losses) - (a[1].wins + a[1].losses))
+      .map(([apiName, data]) => {
+        const totalGames = data.wins + data.losses;
+        const winrate = totalGames > 0 ? ((data.wins / totalGames) * 100).toFixed(1) : '0.0';
+  
+        const kdaRatio =
+          data.deaths > 0
+            ? ((data.kills + data.assists) / data.deaths).toFixed(2)
+            : 'Perfect';
+  
         return {
           apiName,
-          displayName: name,
-          wins,
-          losses,
+          displayName: data.name,
+          wins: data.wins,
+          losses: data.losses,
           winrate,
+          kda: kdaRatio,
         };
       });
-  };
+  };  
 
   const computeTeammates = (matches, username) => {
     const teammateCount = {};
@@ -166,11 +181,22 @@ function MatchList({ matches }) {
     <Box display="flex" gap={2}>
     <Box display="flex" flexDirection="column" gap={2} flex="1" maxWidth="35%">
 
-      <Box sx={{ backgroundColor: '#424254', p: 2, borderRadius: 2 }}>
-        <Typography variant="h6" color="white" gutterBottom>
-          Champion Winrates
-        </Typography>
-        {computeChampionWinrates(matches, username).map((champ, index) => (
+    <Box sx={{ backgroundColor: '#424254', p: 2, borderRadius: 2 }}>
+      <Typography variant="h6" color="white" gutterBottom>
+        Champion Winrates
+      </Typography>
+      {computeChampionWinrates(matches, username).map((champ, index) => {
+        let kdaColor = 'gray';
+        const numericKDA = parseFloat(champ.kda);
+
+        if (!isNaN(numericKDA)) {
+          if (numericKDA > 5) kdaColor = '#FFD700'; 
+          else if (numericKDA > 4) kdaColor = '#4FC3F7'; 
+          else if (numericKDA > 3) kdaColor = '#81C784'; 
+          else if (numericKDA <= 1) kdaColor = '#E57373'; 
+        }
+
+        return (
           <Box
             key={index}
             display="flex"
@@ -185,36 +211,46 @@ function MatchList({ matches }) {
               width={24}
               height={24}
             />
-            <Typography variant="body2" color="white" sx={{ flex: 1 }}>
-              {champ.displayName}
-            </Typography>
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="body2" color="white">
+                {champ.displayName}{' '}
+                <Typography
+                  variant="body2"
+                  component="span"
+                  sx={{ color: kdaColor }}
+                >
+                  ({champ.kda} KDA)
+                </Typography>
+              </Typography>
+            </Box>
             <Typography variant="body2" color="white">
-              {champ.wins}w/{champ.losses}l
-            </Typography>
-            <Typography variant="body2" color="white" sx={{ width: '50px', textAlign: 'right' }}>
-              ({champ.winrate}%)
+              {champ.wins}/{champ.losses}{' '}
+              <Typography variant="body2" component="span" color="gray">
+                ({champ.winrate}%)
+              </Typography>
             </Typography>
           </Box>
-        ))}
-      </Box>
+        );
+      })}
+    </Box>
 
-      <Box sx={{ backgroundColor: '#424254', p: 2, borderRadius: 2 }}>
-        <Typography variant="h6" color="white" gutterBottom>
-          Teammates ratio
-        </Typography>
-        {computeTeammates(matches, username).map((teammate, index) => (
-          <Box
-            key={index}
-            display="flex"
-            justifyContent="space-between"
-            py={0.5}
-            sx={{ borderBottom: '1px solid #555' }}
-          >
-            <Typography variant="body2" color="white">{teammate.name}</Typography>
-            <Typography variant="body2" color="white">{teammate.count} games</Typography>
-          </Box>
-        ))}
-      </Box>
+    <Box sx={{ backgroundColor: '#424254', p: 2, borderRadius: 2 }}>
+      <Typography variant="h6" color="white" gutterBottom>
+        Teammates ratio
+      </Typography>
+      {computeTeammates(matches, username).map((teammate, index) => (
+        <Box
+          key={index}
+          display="flex"
+          justifyContent="space-between"
+          py={0.5}
+          sx={{ borderBottom: '1px solid #555' }}
+        >
+          <Typography variant="body2" color="white">{teammate.name}</Typography>
+          <Typography variant="body2" color="white">{teammate.count} games</Typography>
+        </Box>
+      ))}
+    </Box>
 
     </Box>
     <Box flex="2" maxWidth="75%" display="flex" flexDirection="column" gap={1}>
