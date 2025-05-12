@@ -2,7 +2,8 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { supabase } from './supabase';
 import MatchList from './MatchList'; 
-
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Link } from 'react-router-dom';
 
 function UserProfile() {
   const { username } = useParams();
@@ -58,11 +59,22 @@ function UserProfile() {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div>
-      <h2>Match History for {username}</h2>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <Link to="/" style={{ color: 'inherit', textDecoration: 'none' }}>
+            <ArrowBackIcon sx={{ '&:hover': { color: 'gray' }, cursor: 'pointer' }} />
+          </Link>
+          <h2 style={{ marginBottom: 26}}>
+            Match History for {username}
+          </h2>
+        </span>
+
       <MatchList matches={matches} />
     </div>
   );
+  
+  
 }
 
 export default UserProfile;

@@ -9,8 +9,8 @@ import {
   Divider,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import { useParams } from 'react-router-dom';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess'
+import { useParams, Link } from 'react-router-dom';
 
 const championNameToApiName = {
   "Wukong": "MonkeyKing",
@@ -70,7 +70,16 @@ function MatchList({ matches }) {
           width={24}
           height={24}
         />
-        <Typography variant="body2">{player.user_name || 'Unknown Player'}</Typography>
+        <Typography variant="body2">
+          <Link
+            to={`/username/${player.user_name}`}
+            style={{ textDecoration: 'none', color: 'inherit' }}
+            onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
+            onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
+          >
+            {player.user_name || 'Unknown Player'}
+          </Link>
+        </Typography>
       </Box>
       <Box sx={{ width: '150px' }}>
         <Typography variant="body2">
@@ -152,7 +161,7 @@ function MatchList({ matches }) {
   };  
 
   const computeTeammates = (matches, username) => {
-    const teammateCount = {};
+    const teammateStats = {};
   
     matches.forEach(match => {
       const mainPlayer = match.match_players.find(p => p.user_name === username);
@@ -164,17 +173,27 @@ function MatchList({ matches }) {
   
       sameTeam.forEach(teammate => {
         const name = teammate.user_name || 'Unknown Player';
-        if (!teammateCount[name]) {
-          teammateCount[name] = 0;
+        if (!teammateStats[name]) {
+          teammateStats[name] = {
+            wins: 0,
+            totalGames: 0
+          };
         }
-        teammateCount[name] += 1;
+        teammateStats[name].totalGames += 1;
+        if (teammate.is_win) teammateStats[name].wins += 1;
       });
     });
   
-    return Object.entries(teammateCount)
-      .sort((a, b) => b[1] - a[1]) 
-      .map(([name, count]) => ({ name, count }));
+    return Object.entries(teammateStats)
+      .sort((a, b) => b[1].totalGames - a[1].totalGames) 
+      .map(([name, stats]) => ({
+        name,
+        totalGames: stats.totalGames,
+        wins: stats.wins,
+        winrate: ((stats.wins / stats.totalGames) * 100).toFixed(1)
+      }));
   };
+  
   
 
   return (
@@ -224,7 +243,7 @@ function MatchList({ matches }) {
               </Typography>
             </Box>
             <Typography variant="body2" color="white">
-              {champ.wins}/{champ.losses}{' '}
+              {champ.wins}w/{champ.losses}l{' '}
               <Typography variant="body2" component="span" color="gray">
                 ({champ.winrate}%)
               </Typography>
@@ -236,18 +255,44 @@ function MatchList({ matches }) {
 
     <Box sx={{ backgroundColor: '#424254', p: 2, borderRadius: 2 }}>
       <Typography variant="h6" color="white" gutterBottom>
-        Teammates ratio
+        Teammate ratio
       </Typography>
       {computeTeammates(matches, username).map((teammate, index) => (
         <Box
           key={index}
           display="flex"
-          justifyContent="space-between"
+          justifyContent="space-between" 
+          alignItems="center" 
           py={0.5}
           sx={{ borderBottom: '1px solid #555' }}
         >
-          <Typography variant="body2" color="white">{teammate.name}</Typography>
-          <Typography variant="body2" color="white">{teammate.count} games</Typography>
+          <Typography variant="body2" color="white" sx={{ flex: 1 }}>
+            <Link to={`/${teammate.name}`} style={{ color: 'white', textDecoration: 'none' }}>
+              <Box
+                sx={{
+                  '&:hover': {
+                    color: 'gray',
+                    textDecoration: 'underline', 
+                  },
+                }}
+              >
+                {teammate.name}
+              </Box>
+            </Link>
+          </Typography>
+
+          <Typography variant="body2" color="white" sx={{ textAlign: 'right', mr: 2 }}>
+            {teammate.wins}w / {teammate.totalGames - teammate.wins}l
+          </Typography>
+
+          <Box display="flex" flexDirection="column" alignItems="flex-end">
+            <Typography variant="body2" color="gray">
+              ({teammate.winrate}%)
+            </Typography>
+            <Typography variant="body2" color="white">
+              {teammate.totalGames} games
+            </Typography>
+          </Box>
         </Box>
       ))}
     </Box>
