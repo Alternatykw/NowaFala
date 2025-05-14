@@ -72,7 +72,7 @@ function MatchList({ matches }) {
         />
         <Typography variant="body2">
           <Link
-            to={`/username/${player.user_name}`}
+            to={`/${player.user_name}`}
             style={{ textDecoration: 'none', color: 'inherit' }}
             onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
             onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
