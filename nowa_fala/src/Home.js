@@ -89,7 +89,7 @@ const Home = () => {
                         </span>
                       </Box>
                       <Box sx={{ width: 'auto', display: 'flex', justifyContent: 'center', margin: '2px' }}>
-                        <span style={{ borderRadius: '4px', display: 'inline-block' }}>
+                        <span style={{ borderRadius: '4px', display: 'inline-block', marginLeft: '5px' }}>
                           ({((item.wins / item.played) * 100).toFixed(2)}%)
                         </span>
                       </Box>
