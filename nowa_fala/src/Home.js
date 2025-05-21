@@ -27,7 +27,13 @@ const Home = () => {
   
 
   return (
-    <Container sx={{ width: '60%' }}>
+    <Container
+      sx={{
+        width: { xs: '95%', sm: '80%', md: '60%' },
+        marginTop: '5rem',
+        padding: 0,
+      }}
+    >
       {loading ? (
         <Typography>Loading...</Typography>
       ) : (
@@ -36,7 +42,8 @@ const Home = () => {
           sx={{
             backgroundColor: '#424254',
             display: 'flex',  
-            justifyContent: 'center' 
+            justifyContent: 'center',
+            overflowX: 'auto'
           }}
         >
           <Table>
@@ -70,19 +77,19 @@ const Home = () => {
                 >
                   <TableCell align="center" width="10%">{item.name}</TableCell>
                   <TableCell align="center" width="10%">
-                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                      <Box sx={{ width: '20px', display: 'flex', justifyContent: 'center'}}>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
+                      <Box sx={{ width: '20px', display: 'flex', justifyContent: 'center', margin: '2px' }}>
                         <span style={{ backgroundColor: '#5383E8', padding: '2px 6px', borderRadius: '4px', display: 'inline-block' }}>
                           {item.wins}
                         </span>
-                        </Box>
-                      <Box sx={{ width: '20px', display: 'flex', justifyContent: 'center', marginLeft:'10px'}}>
+                      </Box>
+                      <Box sx={{ width: '20px', display: 'flex', justifyContent: 'center', margin: '2px' }}>
                         <span style={{ backgroundColor: '#FF7074', padding: '2px 6px', borderRadius: '4px', display: 'inline-block' }}>
                           {item.played - item.wins}
                         </span>
                       </Box>
-                      <Box sx={{ width: '20px', display: 'flex', justifyContent: 'center', marginLeft:'30px'}}>
-                        <span style={{borderRadius: '4px', display: 'inline-block' }}>
+                      <Box sx={{ width: 'auto', display: 'flex', justifyContent: 'center', margin: '2px' }}>
+                        <span style={{ borderRadius: '4px', display: 'inline-block' }}>
                           ({((item.wins / item.played) * 100).toFixed(2)}%)
                         </span>
                       </Box>

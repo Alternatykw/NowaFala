@@ -197,8 +197,18 @@ function MatchList({ matches }) {
   
 
   return (
-    <Box display="flex" gap={2}>
-    <Box display="flex" flexDirection="column" gap={2} flex="1" maxWidth="35%">
+    <Box
+      display="flex"
+      gap={2}
+      flexDirection={{ xs: 'column', md: 'row' }}
+    >
+    <Box
+      display="flex"
+      flexDirection="column"
+      gap={2}
+      flex={{ xs: 'unset', md: '1' }}
+      maxWidth={{ xs: '100%', md: '35%' }}
+    >
 
     <Box sx={{ backgroundColor: '#424254', p: 2, borderRadius: 2 }}>
       <Typography variant="h6" color="white" gutterBottom>
@@ -298,7 +308,15 @@ function MatchList({ matches }) {
     </Box>
 
     </Box>
-    <Box flex="2" maxWidth="75%" display="flex" flexDirection="column" gap={1}>
+    
+    <Box
+      flex={{ xs: 'unset', md: '2' }}
+      maxWidth={{ xs: '100%', md: '75%' }}
+      display="flex"
+      flexDirection="column"
+      gap={1}
+    >
+
       {matches.map((match) => {
         const mainPlayer = match.match_players.find(p => p.user_name === username);
         if (!mainPlayer) return <Typography key={match.id}>No matching player found.</Typography>;
@@ -340,11 +358,12 @@ function MatchList({ matches }) {
                       {getDisplayChampionName(mainPlayer?.champion)} {mainPlayer?.role && `(${mainPlayer.role.toUpperCase()})`}
                     </Typography>
                     <Typography fontWeight="bold">{mainPlayer?.is_win ? 'WIN' : 'LOSE'}</Typography>
-                    <Typography variant="body2">
-                      KDA:{' '}
-                      {mainPlayer?.deaths > 0
-                        ? ((mainPlayer.kills + mainPlayer.assists) / mainPlayer.deaths).toFixed(2)
-                        : 'Perfect'}
+                    <Typography variant="body1">
+                      KDA: {mainPlayer?.kills}/{mainPlayer?.deaths}/{mainPlayer?.assists} (
+                        {mainPlayer?.deaths > 0
+                          ? ((mainPlayer.kills + mainPlayer.assists) / mainPlayer.deaths).toFixed(2)
+                          : 'Perfect'}
+                      )
                     </Typography>
                   </Box>
                 </Box>
@@ -355,11 +374,51 @@ function MatchList({ matches }) {
             </CardContent>
 
             <Collapse in={expandedMatchId === match.id}>
-              <Divider sx={{ borderBottom: '3px solid #1C1C1F' }} />
-              {renderTeamSection(team1, 1, team1IsWinner)}
-              <Divider sx={{ borderBottom: '3px solid #1C1C1F' }} />
-              {renderTeamSection(team2, 2, team2IsWinner)}
+              <Box>
+                <Box
+                  sx={{
+                    overflowX: 'scroll',
+                    minWidth: '100%',
+                    '&::-webkit-scrollbar': {
+                      height: '2px',
+                    },
+                    '&::-webkit-scrollbar-thumb': {
+                      backgroundColor: '#888',
+                    },
+                    '&::-webkit-scrollbar-track': {
+                      backgroundColor: '#333',
+                    },
+                  }}
+                >
+                  <Box sx={{ minWidth: '600px' }}>
+                    <Divider sx={{ borderBottom: '3px solid #1C1C1F' }} />
+                    {renderTeamSection(team1, 1, team1IsWinner)}
+                  </Box>
+                </Box>
+
+                <Box
+                  sx={{
+                    overflowX: 'scroll',
+                    minWidth: '100%',
+                    '&::-webkit-scrollbar': {
+                      height: '2px',
+                    },
+                    '&::-webkit-scrollbar-thumb': {
+                      backgroundColor: '#888',
+                    },
+                    '&::-webkit-scrollbar-track': {
+                      backgroundColor: '#333',
+                    },
+                  }}
+                >
+                  <Box sx={{ minWidth: '600px' }}>
+                    <Divider sx={{ borderBottom: '3px solid #1C1C1F' }} />
+                    {renderTeamSection(team2, 2, team2IsWinner)}
+                  </Box>
+                </Box>
+              </Box>
             </Collapse>
+
           </Card>
         );
       })}
