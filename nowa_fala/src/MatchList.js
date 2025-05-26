@@ -63,12 +63,12 @@ function MatchList({ matches }) {
 
   const renderPlayerRow = (player, key) => (
     <Box key={key} display="flex" alignItems="center" py={1}>
-      <Box display="flex" alignItems="center" gap={1} sx={{ width: '175px' }}>
+      <Box display="flex" alignItems="center" gap={1} sx={{ width: '190px' }}>
         <img
           src={`https://ddragon.leagueoflegends.com/cdn/15.9.1/img/champion/${getApiChampionName(player.champion)}.png`}
           alt={player.champion}
-          width={24}
-          height={24}
+          width={32}
+          height={32}
         />
         <Typography variant="body2">
           <Link
@@ -98,18 +98,27 @@ function MatchList({ matches }) {
   );
 
   const renderTeamSection = (team, teamNumber, isWinner) => (
-    <Box sx={{ backgroundColor: isWinner ? winnerColor : loserColor, px: 2, py: 2 }}>
-      <Box display="flex" alignItems="center" py={0.5} sx={{ fontWeight: 'bold' }}>
-        <Box sx={{ width: '175px' }}>{isWinner ? 'Winners' : 'Losers'}</Box>
+    <Box sx={{ backgroundColor: isWinner ? winnerColor : loserColor, px: 2, paddingBottom: 2 }}>
+      <Box display="flex" alignItems="center" py={2} sx={{ fontWeight: 'bold' }}>
+        <Box sx={{ width: '190px' }}>{isWinner ? 'Winners' : 'Losers'}</Box>
         <Box sx={{ width: '150px' }}>KDA</Box>
         <Box sx={{ width: '80px' }}>CS</Box>
         <Box sx={{ width: '80px' }}>DMG</Box>
         <Box sx={{ width: '80px' }}>DMG Taken</Box>
         <Box sx={{ width: '80px' }}>Turret DMG</Box>
       </Box>
-      {team.map((player, i) => renderPlayerRow(player, `${teamNumber}-${i}`))}
+  
+      <Divider sx={{ backgroundColor: '#1C1C1F', mb: 0.5 }} />
+  
+      {team.map((player, i) => (
+        <React.Fragment key={`${teamNumber}-${i}`}>
+          {renderPlayerRow(player, `${teamNumber}-${i}`)}
+          <Divider sx={{ backgroundColor: '#1C1C1F', my: 0.5 }} />
+        </React.Fragment>
+      ))}
     </Box>
   );
+  
 
   const computeChampionWinrates = (matches, username) => {
     const stats = {};
@@ -346,8 +355,8 @@ function MatchList({ matches }) {
                   <img
                     src={`https://ddragon.leagueoflegends.com/cdn/15.9.1/img/champion/${getApiChampionName(mainPlayer?.champion)}.png`}
                     alt={mainPlayer?.champion}
-                    width={32}
-                    height={32}
+                    width={36}
+                    height={36}
                     style={{ borderRadius: '50%' }}
                   />
                   <Box>
