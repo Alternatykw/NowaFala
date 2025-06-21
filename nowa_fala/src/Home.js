@@ -1,23 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Box, Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { Box, Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Skeleton } from '@mui/material';
 import { supabase } from './supabase';
 
 const Home = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
-      const { data, error } = await supabase
-        .from('users') 
-        .select('*')
-        .order('elo', { ascending: false });
+      try {
+        const { data, error } = await supabase
+          .from('users') 
+          .select('*')
+          .order('elo', { ascending: false });
+        if (error) throw error;
+
+        const enrichedData = data.map(user => ({
+          ...user,
+          losses: user.played - user.wins,
+          winrate: user.played > 0 ? ((user.wins / user.played) * 100).toFixed(2) : '0.00',
+        }));
   
-      if (error) {
+        setData(enrichedData);
+      } catch (error) {
         console.error('Supabase fetch error:', error.message);
-      } else {
-        setData(data);
+      } finally {
         setLoading(false);
       }
     };
@@ -25,7 +34,6 @@ const Home = () => {
     fetchData();
   }, []);
   
-
   return (
     <Container
       sx={{
@@ -34,9 +42,16 @@ const Home = () => {
         padding: 0,
       }}
     >
-      {loading ? (
-        <Typography>Loading...</Typography>
-      ) : (
+        {loading ? (
+          <Skeleton
+            variant="rectangular"
+            height={400}
+            sx={{
+              borderRadius: '8px',
+              backgroundColor: '#424254',
+            }}
+          />
+        ) : (
         <TableContainer 
           component={Paper} 
           sx={{
@@ -58,19 +73,16 @@ const Home = () => {
             <TableBody sx={{ '& td': { color: 'white' } }}>
               {data.map((item) => (
                 <TableRow
-                  key={item.id}
-                  component={Link}
-                  to={`/${item.name}`}
+                  onClick={() => navigate(`/${item.name}`)}
                   sx={{
                     borderBottom: '2px solid #1C1C1F',
                     height: '40px',
-                    textDecoration: 'none',
-                    color: 'white',
                     '& td': {
                       paddingTop: '4px',
                       paddingBottom: '4px',
                     },
                     '&:hover': {
+                      cursor: 'pointer',
                       backgroundColor: '#2c2c36', 
                     },
                   }}
@@ -85,12 +97,12 @@ const Home = () => {
                       </Box>
                       <Box sx={{ width: '20px', display: 'flex', justifyContent: 'center', margin: '2px' }}>
                         <span style={{ backgroundColor: '#FF7074', padding: '2px 6px', borderRadius: '4px', display: 'inline-block' }}>
-                          {item.played - item.wins}
+                          {item.losses}
                         </span>
                       </Box>
                       <Box sx={{ width: 'auto', display: 'flex', justifyContent: 'center', margin: '2px' }}>
                         <span style={{ borderRadius: '4px', display: 'inline-block', marginLeft: '5px' }}>
-                          ({((item.wins / item.played) * 100).toFixed(2)}%)
+                          ({item.winrate}%)
                         </span>
                       </Box>
                     </Box>
