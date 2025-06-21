@@ -1,8 +1,9 @@
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { supabase } from './supabase';
+import { supabase } from '../supabase';
 import MatchList from './MatchList'; 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { CircularProgress } from '@mui/material';
 import { Link } from 'react-router-dom';
 
 function UserProfile() {
@@ -53,10 +54,14 @@ function UserProfile() {
       };
       
 
-    fetchMatches();
+      const timeout = setTimeout(() => {
+        fetchMatches();
+      }, 300);
+    
+      return () => clearTimeout(timeout);
   }, [username]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div><CircularProgress /></div>;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
